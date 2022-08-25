@@ -36,4 +36,8 @@ public class StudentService {
     public CollectionResponse<StudentCourse> getStudentCourses(final String studentId, final Pageable pageable) {
         return courseApiClient.getStudentCourses(studentId, pageable);
     }
+
+    public void deleteStudent(final String id) {
+        studentRepository.deleteById(id);
+    }
 }

@@ -4,6 +4,7 @@ import com.example.studentservice.exception.custom.ResourceNotFoundException;
 import com.example.studentservice.model.entity.StudentEntity;
 import com.example.studentservice.model.filter.StudentFilter;
 import com.example.studentservice.model.mapper.StudentMapper;
+import com.example.studentservice.queue.MessagePublisher;
 import com.example.studentservice.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.example.model.dto.CollectionResponse;
@@ -12,6 +13,7 @@ import org.example.model.dto.Student;
 import org.example.model.dto.StudentCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +29,7 @@ import java.util.List;
 public class StudentController {
     private final StudentService studentService;
     private final StudentMapper studentMapper;
+    private final MessagePublisher messagePublisher;
 
     @GetMapping
     public CollectionResponse<Student> getStudents(StudentFilter filter, Pageable pageable) {
@@ -77,7 +80,19 @@ public class StudentController {
                 .build();
     }
 
-    private ResourceNotFoundException getResourceNotFoundException(String id) {
+    @DeleteMapping("{id}")
+    public Student delete(@PathVariable final String id) {
+        final Student student = studentService.getStudent(id)
+                .map(studentMapper::toApi)
+                .orElseThrow(() -> getResourceNotFoundException(id));
+        studentService.deleteStudent(student.id());
+        messagePublisher.publishDeleteStudentFanout(student);
+
+        return student;
+
+    }
+
+    private ResourceNotFoundException getResourceNotFoundException(final String id) {
         return ResourceNotFoundException.forEntity(Student.class, id);
     }
 }
