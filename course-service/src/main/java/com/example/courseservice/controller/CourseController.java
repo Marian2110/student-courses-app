@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseController {
     private final CourseService courseService;
     private final CourseMapper courseMapper;
-
     private final StudentApiClient studentApiClient;
 
     @GetMapping
@@ -75,10 +74,9 @@ public class CourseController {
 
     @PostMapping("/{courseId}/students")
     public CourseStudentEntity addStudent(@PathVariable String courseId, @RequestBody Student student) {
-        final String validatedStudentId = "12";
-//        final String validatedStudentId = studentApiClient.getStudentById(student.id())
-//                .map(Student::id)
-//                .orElseThrow(() -> ResourceNotFoundException.forEntity(Student.class, student.id()));
+        final String validatedStudentId = studentApiClient.getStudentById(student.id())
+                .map(Student::id)
+                .orElseThrow(() -> ResourceNotFoundException.forEntity(Student.class, student.id()));
 
         final String ValidatedCourseId = courseService.getCourse(courseId)
                 .map(CourseEntity::id)

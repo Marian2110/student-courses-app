@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class StudentApiClient {
         try {
             final Student forObject = Objects.requireNonNull(new RestTemplate().exchange(studentapiConfig.url() + "/" + id,
                     HttpMethod.GET,
-                    new HttpEntity<>(null),
+                    new HttpEntity<>(Map.of("Content-Type", "application/json")),
                     new ParameterizedTypeReference<List<Student>>() {
                     }).getBody()).get(0);
             return Optional.ofNullable(forObject);

@@ -11,6 +11,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class CourseApiClient {
@@ -22,7 +24,7 @@ public class CourseApiClient {
         return new RestTemplate().exchange(
                 url,
                 HttpMethod.GET,
-                new HttpEntity<>(null),
+                new HttpEntity<>(Map.of("Content-Type", "application/json")),
                 new ParameterizedTypeReference<CollectionResponse<StudentCourse>>() {
                 }).getBody();
     }
